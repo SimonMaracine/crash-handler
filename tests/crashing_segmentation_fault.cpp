@@ -1,6 +1,5 @@
 #include <iostream>
 #include <thread>
-#include <cstdlib>
 
 #include <crash_handler/crash_handler.hpp>
 
@@ -19,7 +18,7 @@ int main() {
                 std::cout << "Doing stuff\n";
 
                 int* p {nullptr};
-                int v {*p};
+                [[maybe_unused]] int v {*p};
 
                 return 0;
             }
