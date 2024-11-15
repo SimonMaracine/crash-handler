@@ -14,8 +14,10 @@ namespace crash_handler {
         If, however, the child doesn't terminate normally, the current process calls crash_handle and exits from
         fork with 1.
 
-        fork throws Error, if any of the system calls fail, it throws std::bad_alloc, if any memory allocation fails,
-        and it throws any exception that main_program and crash_handle may throw.
+        fork throws:
+            Error, if any of the system calls fail,
+            std::bad_alloc, if any memory allocation fails, and
+            any exception that main_program and crash_handle may throw.
     */
 
     // Information about the crash
