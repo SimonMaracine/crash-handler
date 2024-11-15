@@ -48,7 +48,7 @@ int main() {
     try {
         return crash_handler::fork(crash_handle, process_start);
     } catch (const crash_handler::Error& e) {
-        std::cerr << "crash_handler: " << e.what() << "\n";
+        std::cerr << "crash_handler: " << e.what() << '\n';
         return 1;
     }
 }

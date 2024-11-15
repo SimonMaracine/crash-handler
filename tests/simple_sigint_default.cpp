@@ -37,7 +37,7 @@ int main() {
             }
         );
     } catch (const crash_handler::Error& e) {
-        std::cerr << "crash_handler: " << e.what() << "\n";
+        std::cerr << "crash_handler: " << e.what() << '\n';
         return 1;
     }
 }
