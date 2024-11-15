@@ -14,7 +14,7 @@
 
 namespace crash_handler {
     template<typename F, typename... Args>
-    static int fork_generic(CrashHandle crash_handle, F&& main_program, Args&&... args) {
+    static int fork_base(CrashHandle crash_handle, F&& main_program, Args&&... args) {
         using namespace std::literals;
 
         const pid_t fresult {::fork()};
@@ -61,10 +61,10 @@ namespace crash_handler {
     }
 
     int fork(CrashHandle crash_handle, MainProgramArgs main_program, int argc, char** argv) {
-        return fork_generic(crash_handle, main_program, argc, argv);
+        return fork_base(crash_handle, main_program, argc, argv);
     }
 
     int fork(CrashHandle crash_handle, MainProgram main_program) {
-        return fork_generic(crash_handle, main_program);
+        return fork_base(crash_handle, main_program);
     }
 }

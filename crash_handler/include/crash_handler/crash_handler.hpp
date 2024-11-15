@@ -46,3 +46,7 @@ namespace crash_handler {
             : std::runtime_error(message) {}
     };
 }
+
+#define CRASH_HANDLER_VERSION_MAJOR 0
+#define CRASH_HANDLER_VERSION_MINOR 1
+#define CRASH_HANDLER_VERSION_PATCH 0

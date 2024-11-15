@@ -12,10 +12,12 @@ int main() {
                 const auto command {"zenity --error --text='Oops! The program crashed. " + info.message + ".' --title='Program Crash'"};
                 const int result {std::system(command.c_str())};
 
-                if (WEXITSTATUS(result) != 0) {
-                    std::cerr << "crash_handler: Could not display error message pop up\n";
-                    std::cerr << "crash_handler: " << "Child crashed: " << info.message << '\n';
+                if (WEXITSTATUS(result) == 0) {
+                    return;
                 }
+
+                std::cerr << "crash_handler: Could not display error message pop up\n";
+                std::cerr << "crash_handler: " << "Child crashed: " << info.message << '\n';
             },
             []() {
                 using namespace std::chrono_literals;
