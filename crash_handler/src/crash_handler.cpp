@@ -1,32 +1,56 @@
 #include "crash_handler/crash_handler.hpp"
 
 #include <utility>
-
 #include <cstring>
 #include <cerrno>
 #include <unistd.h>
 #include <sys/wait.h>
 
+// https://man7.org/linux/man-pages/man2/fork.2.html
+// https://www.man7.org/linux/man-pages/man2/wait.2.html
+// https://man7.org/linux/man-pages/man7/signal.7.html
+// https://man7.org/linux/man-pages/man3/strsignal.3.html
+// https://www.man7.org/linux/man-pages/man3/errno.3.html
+
 namespace crash_handler {
     template<typename F, typename... Args>
-    static int fork_generic(CrashHandle crash_handle, F&& process_start, Args&&... args) {
+    static int fork_generic(CrashHandle crash_handle, F&& main_program, Args&&... args) {
         using namespace std::literals;
 
         const pid_t fresult {::fork()};
 
         if (fresult == 0) {
-            return process_start(std::forward<Args>(args)...);
+            return main_program(std::forward<Args>(args)...);
         } else if (fresult > 0) {
             int wstatus {};
-            const int wresult {waitpid(fresult, &wstatus, 0)};
 
-            if (wresult < 0) {
-                // TODO terminate child
+            // Wait only for terminated child
+            // waitpid doesn't conform to POSIX and it does exactly what we want
+            if (waitpid(fresult, &wstatus, 0) < 0) {
                 throw Error("Could not wait for process: "s + std::strerror(errno));
             }
 
             if (!WIFEXITED(wstatus)) {
-                crash_handle();
+                CrashInfo info;
+
+                // Better to give up on message than to never call crash_handle
+                try {
+                    if (WIFSIGNALED(wstatus)) {
+                        info.message = "Process terminated by signal "s + sigabbrev_np(WTERMSIG(wstatus));
+#ifdef WCOREDUMP
+                        if (WCOREDUMP(wstatus)) {
+                            info.message += " and produced a core dump";
+                        } else {
+                            info.message += "; produced no core dump";
+                        }
+#endif
+                    } else {
+                        info.message = "Process terminated";
+                    }
+                } catch (const std::bad_alloc&) {}
+
+                crash_handle(info);
+
                 return 1;
             }
 
@@ -36,11 +60,11 @@ namespace crash_handler {
         }
     }
 
-    int fork(CrashHandle crash_handle, ProcessStartArgs process_start, int argc, char** argv) {
-        return fork_generic(crash_handle, process_start, argc, argv);
+    int fork(CrashHandle crash_handle, MainProgramArgs main_program, int argc, char** argv) {
+        return fork_generic(crash_handle, main_program, argc, argv);
     }
 
-    int fork(CrashHandle crash_handle, ProcessStart process_start) {
-        return fork_generic(crash_handle, process_start);
+    int fork(CrashHandle crash_handle, MainProgram main_program) {
+        return fork_generic(crash_handle, main_program);
     }
 }

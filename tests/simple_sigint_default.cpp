@@ -12,8 +12,8 @@ int main() {
 
     try {
         return crash_handler::fork(
-            []() {
-                std::cerr << "crash_handler: " << "Child crashed\n";
+            [](const crash_handler::CrashInfo& info) {
+                std::cerr << "crash_handler: " << "Child crashed: " << info.message << '\n';
                 std::cerr << "crash_handler: " << "It's best to launch a pop up window or a notification\n";
             },
             []() {

@@ -12,6 +12,12 @@ target_link_libraries(crashing_abort PRIVATE crash_handler)
 add_executable(crashing_exception "crashing_exception.cpp")
 target_link_libraries(crashing_exception PRIVATE crash_handler)
 
+add_executable(crashing_segmentation_fault "crashing_segmentation_fault.cpp")
+target_link_libraries(crashing_segmentation_fault PRIVATE crash_handler)
+
+add_executable(crashing_abort_gui "crashing_abort_gui.cpp")
+target_link_libraries(crashing_abort_gui PRIVATE crash_handler)
+
 add_executable(simple_sigint_default "simple_sigint_default.cpp")
 target_link_libraries(simple_sigint_default PRIVATE crash_handler)
 

@@ -34,8 +34,8 @@ static int process_start() {
     return 0;
 }
 
-static void crash_handle() {
-    std::cerr << "crash_handler: " << "Child crashed\n";
+static void crash_handle(const crash_handler::CrashInfo& info) {
+    std::cerr << "crash_handler: " << "Child crashed: " << info.message << '\n';
     std::cerr << "crash_handler: " << "It's best to launch a pop up window or a notification\n";
 }
 

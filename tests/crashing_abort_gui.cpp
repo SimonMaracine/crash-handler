@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <cstdlib>
 
 #include <crash_handler/crash_handler.hpp>
 
@@ -7,8 +8,14 @@ int main() {
     try {
         return crash_handler::fork(
             [](const crash_handler::CrashInfo& info) {
-                std::cerr << "crash_handler: " << "Child crashed: " << info.message << '\n';
-                std::cerr << "crash_handler: " << "It's best to launch a pop up window or a notification\n";
+                // Works only for GTK
+                const auto command {"zenity --error --text='Oops! The program crashed. " + info.message + ".' --title='Program Crash'"};
+                const int result {std::system(command.c_str())};
+
+                if (WEXITSTATUS(result) != 0) {
+                    std::cerr << "crash_handler: Could not display error message pop up\n";
+                    std::cerr << "crash_handler: " << "Child crashed: " << info.message << '\n';
+                }
             },
             []() {
                 using namespace std::chrono_literals;
@@ -17,7 +24,7 @@ int main() {
                 std::this_thread::sleep_for(1s);
                 std::cout << "Doing stuff\n";
 
-                throw 5;
+                std::abort();
 
                 return 0;
             }
